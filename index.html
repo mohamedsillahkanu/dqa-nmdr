@@ -163,25 +163,18 @@ body{background:#f1f3f5;font-family:'Oswald',Arial,sans-serif;color:#000;font-we
 /* Drive config banner */
 .drive-config-banner{background:#e7f3ff;border:2px solid #3b78a8;border-radius:8px;padding:12px 16px;margin-bottom:14px;font-size:12px;color:#1e4d70;display:flex;align-items:flex-start;gap:10px;flex-wrap:wrap;}
 .drive-config-banner code{background:#fff;border:1px solid #b8d4f0;border-radius:4px;padding:2px 6px;font-size:11px;color:#1e4d70;}
-@media(max-width:768px){body{padding:6px;}.content-inner{padding:12px;}.page-header{padding:14px 12px;}.page-header h1{font-size:16px;}.page-header .subtitle{font-size:11px;}.logo-row{gap:10px;}.status-bar{padding:10px 12px;flex-direction:column;align-items:flex-start;gap:8px;}.meta-pill{font-size:10px;padding:2px 10px;}.stats-grid{grid-template-columns:repeat(2,1fr)!important;}.sum-cards{grid-template-columns:repeat(2,1fr)!important;}.nav-cards{grid-template-columns:1fr!important;}.tab-bar{gap:3px;padding:6px;flex-wrap:wrap;}.tab-btn{padding:6px 10px;font-size:11px;}.matrix-wrap{max-height:320px;overflow-x:auto;-webkit-overflow-scrolling:touch;}.matrix-table{min-width:500px;}.month-cards-grid{grid-template-columns:1fr!important;}.fac-hdr{padding:12px;}.fac-name{font-size:16px!important;}.tbl-wrap{font-size:11px;overflow-x:auto;-webkit-overflow-scrolling:touch;}.dqa-table{min-width:420px;}.dqa-table th,.dqa-table td{padding:6px 8px;}.btn{padding:7px 12px;font-size:11px;}.btn-lg{padding:9px 14px;font-size:12px;}.sec-hdr{padding:10px 12px;}.sec-title{font-size:13px;}.method-box{padding:12px;}.content-card{margin-bottom:10px;}.back-btn{padding:7px 12px;font-size:12px;}select,input[type=month],input[type=number],input[type=text]{font-size:16px!important;}
-  /* All inline grid overrides — force 1 col on phone */
+@media(max-width:768px){body{padding:6px;}.content-inner{padding:12px;}.page-header{padding:14px 12px;}.page-header h1{font-size:16px;}.page-header .subtitle{font-size:11px;}.logo-row{gap:10px;}.status-bar{padding:10px 12px;flex-direction:column;align-items:flex-start;gap:8px;}.meta-pill{font-size:10px;padding:2px 10px;}.stats-grid{grid-template-columns:1fr!important;}.sum-cards{grid-template-columns:1fr!important;}.nav-cards{grid-template-columns:1fr!important;}.tab-bar{gap:3px;padding:6px;flex-wrap:wrap;}.tab-btn{padding:6px 10px;font-size:11px;}.matrix-wrap{max-height:320px;overflow-x:auto;-webkit-overflow-scrolling:touch;}.matrix-table{min-width:500px;}.month-cards-grid{grid-template-columns:1fr!important;}.fac-hdr{padding:12px;}.fac-name{font-size:16px!important;}.tbl-wrap{font-size:11px;overflow-x:auto;-webkit-overflow-scrolling:touch;}.dqa-table{min-width:420px;}.dqa-table th,.dqa-table td{padding:6px 8px;}.btn{padding:7px 12px;font-size:11px;}.btn-lg{padding:9px 14px;font-size:12px;}.sec-hdr{padding:10px 12px;}.sec-title{font-size:13px;}.method-box{padding:12px;}.content-card{margin-bottom:10px;}.back-btn{padding:7px 12px;font-size:12px;}select,input[type=month],input[type=number],input[type=text]{font-size:16px!important;}
   [style*="grid-template-columns:repeat(2"]{grid-template-columns:1fr!important;}
   [style*="grid-template-columns:repeat(3"]{grid-template-columns:1fr!important;}
   [style*="grid-template-columns:repeat(4"]{grid-template-columns:1fr!important;}
   [style*="grid-template-columns:repeat(5"]{grid-template-columns:1fr!important;}
-  /* Coherency scatter grid */
   #r-coh-scatter > div[style*="grid-template-columns"]{grid-template-columns:1fr!important;}
   .plot-box{min-height:280px!important;}
-  /* HF Browser nav cards — counts row stacks */
   .nc-counts{flex-wrap:wrap;gap:6px;}
   .nc-cnt{min-width:60px;}
-  /* Pipeline/action button rows stack */
-  .status-bar > div[style*="display:flex"]{flex-direction:column!important;gap:8px!important;}
-  /* Page container full width */
   .page-container{padding:0;}
 }
 @media(min-width:769px) and (max-width:1024px){
-  /* Tablet — 2-col for stats, 1-col for nav cards */
   .stats-grid{grid-template-columns:repeat(2,1fr)!important;}
   .sum-cards{grid-template-columns:repeat(3,1fr)!important;}
   .nav-cards{grid-template-columns:1fr!important;}
@@ -190,20 +183,16 @@ body{background:#f1f3f5;font-family:'Oswald',Arial,sans-serif;color:#000;font-we
   [style*="grid-template-columns:repeat(3"]{grid-template-columns:1fr!important;}
   [style*="grid-template-columns:repeat(4"]{grid-template-columns:repeat(2,1fr)!important;}
   [style*="grid-template-columns:repeat(5"]{grid-template-columns:repeat(2,1fr)!important;}
-  /* Scatter plots side-by-side → stack */
   #r-coh-scatter > div[style*="grid-template-columns"]{grid-template-columns:1fr!important;}
   .content-inner{padding:16px;}
 }
-@media(max-width:480px){body{padding:4px;}.page-header h1{font-size:14px;letter-spacing:.3px;}.page-header h3{font-size:11px;}.logo-row{display:none;}.page-header{padding:12px 10px;border-radius:8px 8px 0 0;}.stats-grid{grid-template-columns:repeat(2,1fr)!important;}.sum-cards{grid-template-columns:repeat(2,1fr)!important;}.nav-cards{grid-template-columns:1fr!important;}.tab-bar{flex-direction:column;gap:2px;padding:6px;}.tab-btn{width:100%;text-align:left;padding:10px 14px;font-size:13px;border-radius:6px;border:2px solid #ddd;}.tab-btn.active{border-left:4px solid #3b78a8;border-bottom:2px solid #ddd;background:#3b78a8;color:#fff;}.matrix-wrap{max-height:260px;overflow-x:auto;}.month-cards-grid{grid-template-columns:1fr!important;}.status-bar{flex-direction:column;gap:6px;}.content-inner{padding:10px 8px;}
+@media(max-width:480px){body{padding:4px;}.page-header h1{font-size:14px;letter-spacing:.3px;}.page-header h3{font-size:11px;}.logo-row{display:none;}.page-header{padding:12px 10px;border-radius:8px 8px 0 0;}.stats-grid{grid-template-columns:1fr!important;}.sum-cards{grid-template-columns:1fr!important;}.nav-cards{grid-template-columns:1fr!important;}.tab-bar{flex-direction:column;gap:2px;padding:6px;}.tab-btn{width:100%;text-align:left;padding:10px 14px;font-size:13px;border-radius:6px;border:2px solid #ddd;}.tab-btn.active{border-left:4px solid #3b78a8;border-bottom:2px solid #ddd;background:#3b78a8;color:#fff;}.matrix-wrap{max-height:260px;overflow-x:auto;}.month-cards-grid{grid-template-columns:1fr!important;}.status-bar{flex-direction:column;gap:6px;}.content-inner{padding:10px 8px;}
   [style*="grid-template-columns:repeat(2"]{grid-template-columns:1fr!important;}
   [style*="grid-template-columns:repeat(3"]{grid-template-columns:1fr!important;}
   [style*="grid-template-columns:repeat(4"]{grid-template-columns:1fr!important;}
   [style*="grid-template-columns:repeat(5"]{grid-template-columns:1fr!important;}
-  /* Nav cards counts stacks to 2-col */
   .nc-counts{flex-wrap:wrap;}
   .nc-cnt{min-width:70px;flex:0 0 calc(50% - 6px);}
-  /* Fac header stacks */
-  .fac-hdr > div > div:first-child{flex-direction:column;gap:4px;}
 }
 @media(pointer:coarse){.btn,.tab-btn,.back-btn,.nav-card{min-height:44px;}select,input{min-height:44px;}.tab-btn{min-height:40px;}}
 html.dashboard-mode body{padding:6px;}
@@ -551,7 +540,7 @@ function buildDQAHtmlBlob(){
     start,end,rawData,dqaResults,fullOUMap,allFacMeta,
     ALL_VAR_KEYS,VAR_LABELS,MAP,UID_TO_KEY,
     bRows,bHierarchy,bCohIssues,bWrIssues,bOutIssues,
-    bIncIssues,bAllPeriods,facRowLookup
+    bIncIssues,bAllPeriods,facRowLookup,bFacBounds
   };
   const bootstrap=`<script id="__dqa_bootstrap__">
 (function(){
@@ -564,7 +553,10 @@ function buildDQAHtmlBlob(){
     MAP=S.MAP; UID_TO_KEY=S.UID_TO_KEY; bRows=S.bRows; bHierarchy=S.bHierarchy;
     bCohIssues=S.bCohIssues; bWrIssues=S.bWrIssues; bOutIssues=S.bOutIssues;
     bIncIssues=S.bIncIssues; bAllPeriods=S.bAllPeriods; facRowLookup=S.facRowLookup;
+    bFacBounds=S.bFacBounds||{};
     bBrowserReady=true;
+    // Restore bounds on each bRow entry from bFacBounds
+    bRows.forEach(function(r){ r.bounds=bFacBounds[r.facility]||{}; });
     // Rebuild window lookups that are not serialised in STATE
     window.facDisplayName={};
     window.facMetaByDisplayName={};
@@ -734,12 +726,15 @@ async function saveDQAToGoogleDrive(){
     const high=withData.filter(r=>parseFloat(r.total)<75).length;
     const avg=withData.length>0?(withData.reduce((s,r)=>s+parseFloat(r.total),0)/withData.length).toFixed(1):0;
 
-    // Send as data URL — same format as RS/TPR canvases use toDataURL()
+    // Send dqa_report.html as data URL in files map.
+    // Updated GAS stores this in ScriptProperties (not Drive) and
+    // returns it as-is in getDashboard so dvOpenDqa() can open it
+    // as a Blob URL in the same browser tab — no Drive blocking.
     const files={
-      'dqa_report.html':'data:text/html;base64,'+b64
+      'dqa_report.html': 'data:text/html;base64,'+b64
     };
     const titles={
-      dqaTitle:'DQA Report · '+period,
+      dqaTitle:'DQA Report \xb7 '+period,
       dqaPeriod:period,
       dqaFacilities:withData.length+' reporting / '+(rankings.length)+' total',
       dqaAvgScore:avg+'%',
@@ -747,11 +742,11 @@ async function saveDQAToGoogleDrive(){
     };
 
     const body=new URLSearchParams({
-      action: 'saveDashboard',
-      files:  JSON.stringify(files),
+      action:  'saveDashboard',
+      files:   JSON.stringify(files),
       ts,
       period,
-      titles: JSON.stringify(titles)
+      titles:  JSON.stringify(titles)
     });
 
     const resp=await fetch(DV_GAS_FROM_DQA,{method:'POST',body});
