@@ -234,14 +234,40 @@ html.dashboard-mode .content-inner{padding:12px;}
 
 <div class="status-bar" style="flex-direction:column;align-items:flex-start;gap:12px;padding:16px 20px;">
   <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;width:100%;">
+
+    <!-- Mode toggle -->
     <div style="display:flex;flex-direction:column;gap:4px;">
-      <label style="font-size:10px;font-weight:700;color:#3b78a8;text-transform:uppercase;letter-spacing:.6px;">Start Month</label>
-      <input type="month" id="cfgStart" style="padding:7px 10px;border:1.5px solid #3b78a8;border-radius:6px;font-size:13px;font-family:inherit;color:#222;">
+      <label style="font-size:10px;font-weight:700;color:#3b78a8;text-transform:uppercase;letter-spacing:.6px;">Mode</label>
+      <div style="display:flex;border:1.5px solid #3b78a8;border-radius:6px;overflow:hidden;">
+        <button id="modeRange" onclick="setDqaMode('range')"
+          style="padding:7px 14px;font-size:12px;font-weight:700;font-family:inherit;border:none;background:#3b78a8;color:#fff;cursor:pointer;transition:all .2s;">
+          Range
+        </button>
+        <button id="modeSingle" onclick="setDqaMode('single')"
+          style="padding:7px 14px;font-size:12px;font-weight:700;font-family:inherit;border:none;background:#fff;color:#3b78a8;cursor:pointer;transition:all .2s;">
+          Single Month
+        </button>
+      </div>
     </div>
-    <div style="display:flex;flex-direction:column;gap:4px;">
-      <label style="font-size:10px;font-weight:700;color:#3b78a8;text-transform:uppercase;letter-spacing:.6px;">End Month</label>
-      <input type="month" id="cfgEnd" style="padding:7px 10px;border:1.5px solid #3b78a8;border-radius:6px;font-size:13px;font-family:inherit;color:#222;">
+
+    <!-- Range inputs -->
+    <div id="inputRange" style="display:flex;align-items:flex-end;gap:10px;flex-wrap:wrap;">
+      <div style="display:flex;flex-direction:column;gap:4px;">
+        <label style="font-size:10px;font-weight:700;color:#3b78a8;text-transform:uppercase;letter-spacing:.6px;">Start Month</label>
+        <input type="month" id="cfgStart" style="padding:7px 10px;border:1.5px solid #3b78a8;border-radius:6px;font-size:13px;font-family:inherit;color:#222;">
+      </div>
+      <div style="display:flex;flex-direction:column;gap:4px;">
+        <label style="font-size:10px;font-weight:700;color:#3b78a8;text-transform:uppercase;letter-spacing:.6px;">End Month</label>
+        <input type="month" id="cfgEnd" style="padding:7px 10px;border:1.5px solid #3b78a8;border-radius:6px;font-size:13px;font-family:inherit;color:#222;">
+      </div>
     </div>
+
+    <!-- Single month input -->
+    <div id="inputSingle" style="display:none;flex-direction:column;gap:4px;">
+      <label style="font-size:10px;font-weight:700;color:#3b78a8;text-transform:uppercase;letter-spacing:.6px;">Month</label>
+      <input type="month" id="cfgSingle" style="padding:7px 10px;border:1.5px solid #3b78a8;border-radius:6px;font-size:13px;font-family:inherit;color:#222;">
+    </div>
+
     <div style="margin-top:18px;">
       <button class="btn btn-primary" onclick="runPipeline()" id="runBtn" style="padding:9px 22px;font-size:13px;background:#3b78a8;">&#9654; Run DQA Pipeline</button>
     </div>
@@ -594,11 +620,10 @@ function buildDQAHtmlBlob(){
   const dsEl=clone.querySelector('#dqaDriveStatus');
   if(dsEl){ const wrap=dsEl.closest('div[style*="text-align:center"]'); if(wrap) wrap.remove(); else dsEl.remove(); }
 
-  // 4. Remove Run/Reset/Drive/Download buttons — keep only Excel + CSV buttons
-  //    The export row has id-less buttons; tag the ones we want to remove by onclick attr
-  ['runPipeline','dqaReset','downloadDQAHtml','saveDQAToGoogleDrive'].forEach(fn=>{
+  // 4. Remove all action buttons — pipeline, save, download, export
+  ['runPipeline','dqaReset','downloadDQAHtml','saveDQAToGoogleDrive',
+   'exportExcel','exportPriorityCSV'].forEach(fn=>{
     clone.querySelectorAll('button[onclick*="'+fn+'"]').forEach(btn=>{
-      // Also remove the wrapping div[style*="margin-top:18px"] if it only contained this button
       const wrap=btn.parentElement;
       if(wrap && wrap.tagName==='DIV' && wrap.children.length===1) wrap.remove();
       else btn.remove();
@@ -608,16 +633,32 @@ function buildDQAHtmlBlob(){
   const dqaDriveBtn=clone.querySelector('#dqaDriveBtn');
   if(dqaDriveBtn){ const wrap=dqaDriveBtn.closest('div[style*="justify-content:center"]'); if(wrap) wrap.remove(); }
 
-  // 5. Replace the (now potentially empty) export actions area with a read-only caption
-  //    Find the border-top separator div inside content-inner
+  // 4b. Remove XLSX library tag — not needed in read-only report
+  clone.querySelectorAll('script[src*="xlsx"]').forEach(el=>el.remove());
+
+  // 5. Replace export actions area with read-only caption
   clone.querySelectorAll('div[style*="border-top:2px solid #e0e0e0"]').forEach(el=>{
     el.innerHTML='<div style="text-align:center;padding:10px 0;font-size:12px;color:#6c757d;font-style:italic;">Saved DQA Report &mdash; '+start+' &rarr; '+end+' &middot; ICF-SL / NMCP</div>';
   });
 
-  // 6. Remove month inputs + Run/Reset button wrappers from status bar
-  //    (input[type=month] and their label wrappers)
-  clone.querySelectorAll('input[type="month"]').forEach(inp=>{
-    const wrap=inp.closest('div[style*="flex-direction:column"]'); if(wrap) wrap.remove();
+  // 6. Remove the entire status bar (date inputs, mode toggle, run/reset buttons)
+  //    In the saved report the period is fixed — no pipeline controls needed
+  const statusBarEl = clone.querySelector('.status-bar');
+  if(statusBarEl){
+    // Replace with a simple read-only period banner
+    const banner = clone.createElement ? clone.createElement('div') : document.createElement('div');
+    const b = document.createElement('div');
+    b.style.cssText='background:#e7f3ff;border:4px double #3b78a8;border-top:none;padding:10px 20px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;';
+    b.innerHTML='<span style="font-size:11px;font-weight:700;color:#3b78a8;text-transform:uppercase;letter-spacing:.8px;">DQA Period:</span>'
+      +'<span style="background:#3b78a8;color:#fff;padding:3px 14px;border-radius:20px;font-size:12px;font-weight:700;">'+start+' &rarr; '+end+'</span>'
+      +'<span style="font-size:11px;color:#888;margin-left:4px;font-style:italic;">Read-only saved report &middot; ICF-SL / NMCP</span>';
+    statusBarEl.parentNode.insertBefore(b, statusBarEl);
+    statusBarEl.remove();
+  }
+
+  // 6b. Also remove the HF type filter bar below the status bar
+  clone.querySelectorAll('div[style*="background:#f0f6ff"]').forEach(el=>{
+    if(el.textContent.includes('HF Types in Assessment')) el.remove();
   });
 
   // 7. Remove any previous bootstrap script
@@ -674,31 +715,56 @@ async function saveDQAToGoogleDrive(){
   const statusEl=document.getElementById('dqaDriveStatus');
   const btnEl   =document.getElementById('dqaDriveBtn');
 
-  function setDs(msg,color,spin){
+  // ── Progress bar UI ──────────────────────────────────────────
+  function setDs(msg,color,pct){
     if(!statusEl) return;
-    statusEl.style.display='inline-flex';
-    statusEl.style.background=color;
-    statusEl.style.alignItems='center';
-    statusEl.style.padding='8px 18px';
-    statusEl.style.borderRadius='20px';
-    statusEl.style.color='#fff';
-    statusEl.style.fontWeight='700';
-    statusEl.style.fontSize='12px';
-    statusEl.innerHTML=(spin?'<span class="drive-spin"></span>':'')+msg;
+    const pctStr = pct!=null ? ` (${pct}%)` : '';
+    statusEl.style.cssText='display:block;margin-top:12px;padding:12px 16px;border-radius:8px;border:2px solid '+color+';background:'+color+'18;';
+    statusEl.innerHTML=`
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+        <span style="font-size:12px;font-weight:700;color:${color};">${msg}</span>
+        <span style="font-size:11px;font-weight:700;color:${color};">${pctStr}</span>
+      </div>
+      <div style="height:6px;background:#e0e0e0;border-radius:4px;overflow:hidden;">
+        <div style="height:100%;width:${pct!=null?pct:100}%;background:${color};border-radius:4px;transition:width .4s ease;${pct==null?'animation:indeterminate 1.4s infinite;':''}"></div>
+      </div>`;
+  }
+  function setDsDone(msg){
+    if(!statusEl) return;
+    statusEl.style.cssText='display:block;margin-top:12px;padding:12px 16px;border-radius:8px;border:2px solid #28a745;background:#d4edda;';
+    statusEl.innerHTML=`<span style="font-size:12px;font-weight:700;color:#155724;">✔ ${msg}</span>`;
+  }
+  function setDsErr(msg){
+    if(!statusEl) return;
+    statusEl.style.cssText='display:block;margin-top:12px;padding:12px 16px;border-radius:8px;border:2px solid #dc3545;background:#f8d7da;';
+    statusEl.innerHTML=`<span style="font-size:12px;font-weight:700;color:#721c24;">✗ ${msg}</span>`;
   }
 
-  setDs('Building DQA report…','#17a2b8',true);
+  // Add indeterminate animation if not already present
+  if(!document.getElementById('driveSpinStyle')){
+    const s=document.createElement('style');
+    s.id='driveSpinStyle';
+    s.textContent='@keyframes indeterminate{0%{transform:translateX(-100%)}100%{transform:translateX(400%)}}';
+    document.head.appendChild(s);
+  }
+
   if(btnEl){btnEl.disabled=true;btnEl.style.opacity='.55';}
 
+  // Stage 1 — Build HTML blob
+  setDs('Stage 1/4 — Building report snapshot…','#17a2b8',10);
+  await new Promise(r=>setTimeout(r,30)); // yield to let UI update
   let html;
   try{ html=buildDQAHtmlBlob(); }
   catch(e){
-    setDs('Build error: '+e.message,'#dc3545',false);
+    setDsErr('Build failed: '+e.message);
     if(btnEl){btnEl.disabled=false;btnEl.style.opacity='1';}
     return;
   }
 
-  setDs('Encoding…','#17a2b8',true);
+  // Stage 2 — Encode to base64
+  const rawKB = Math.round(html.length/1024);
+  setDs(`Stage 2/4 — Encoding ${rawKB} KB to base64…`,'#17a2b8',30);
+  await new Promise(r=>setTimeout(r,30));
   let b64;
   try{
     const bytes=new TextEncoder().encode(html);
@@ -709,13 +775,15 @@ async function saveDQAToGoogleDrive(){
     }
     b64=btoa(binary);
   }catch(e){
-    setDs('Encoding error: '+e.message,'#dc3545',false);
+    setDsErr('Encoding failed: '+e.message);
     if(btnEl){btnEl.disabled=false;btnEl.style.opacity='1';}
     return;
   }
 
+  // Stage 3 — Upload to GAS/Drive
   const sizeKB=Math.round(b64.length/1024);
-  setDs(`Uploading to Dashboard Drive… (${sizeKB} KB)`,'#17a2b8',true);
+  setDs(`Stage 3/4 — Uploading ${sizeKB} KB to Google Drive…`,'#f0a500',55);
+  await new Promise(r=>setTimeout(r,30));
 
   try{
     const now=new Date();
@@ -726,13 +794,7 @@ async function saveDQAToGoogleDrive(){
     const high=withData.filter(r=>parseFloat(r.total)<75).length;
     const avg=withData.length>0?(withData.reduce((s,r)=>s+parseFloat(r.total),0)/withData.length).toFixed(1):0;
 
-    // Send dqa_report.html as data URL in files map.
-    // Updated GAS stores this in ScriptProperties (not Drive) and
-    // returns it as-is in getDashboard so dvOpenDqa() can open it
-    // as a Blob URL in the same browser tab — no Drive blocking.
-    const files={
-      'dqa_report.html': 'data:text/html;base64,'+b64
-    };
+    const files={'dqa_report.html':'data:text/html;base64,'+b64};
     const titles={
       dqaTitle:'DQA Report \xb7 '+period,
       dqaPeriod:period,
@@ -742,35 +804,27 @@ async function saveDQAToGoogleDrive(){
     };
 
     const body=new URLSearchParams({
-      action:  'saveDashboard',
-      files:   JSON.stringify(files),
-      ts,
-      period,
-      titles:  JSON.stringify(titles)
+      action:'saveDashboard',files:JSON.stringify(files),ts,period,titles:JSON.stringify(titles)
     });
 
     const resp=await fetch(DV_GAS_FROM_DQA,{method:'POST',body});
+
+    // Stage 4 — Processing response
+    setDs('Stage 4/4 — GAS processing…','#f0a500',85);
     const data=await resp.json();
 
     if(data.ok){
-      setDs(
-        '✔ DQA report saved to Dashboard — visible on the Dashboard tab now · '+period,
-        '#28a745',false
-      );
-      // Notify parent window (index.html) so publish banner appears automatically
-      try {
+      setDsDone('Saved to Dashboard · '+period+' · Avg score: '+avg+'% · High priority: '+high);
+      try{
         window.parent.postMessage({
-          type:          'dqa_saved',
-          period:        period,
-          avgScore:      avg + '%',
-          highPriority:  high + ' facilities'
-        }, '*');
-      } catch(pe) {}
+          type:'dqa_saved',period,avgScore:avg+'%',highPriority:high+' facilities'
+        },'*');
+      }catch(pe){}
     } else {
-      setDs('Drive error: '+(data.error||'Unknown — check GAS saveDashboard handler'),'#dc3545',false);
+      setDsErr('Drive error: '+(data.error||'Unknown — check GAS'));
     }
   }catch(e){
-    setDs('Upload failed: '+e.message,'#dc3545',false);
+    setDsErr('Upload failed: '+e.message);
   } finally {
     if(btnEl){btnEl.disabled=false;btnEl.style.opacity='1';}
   }
@@ -783,7 +837,35 @@ function _setStep(id,status,msg){const el=_stepEls[id];if(!el)return;const color
 function setBar(p){document.getElementById('pbarFill').style.width=p+'%';document.getElementById('pctLabel').textContent=Math.round(p)+'%';}
 function setPipelineStatus(txt,color){const el=document.getElementById('pipelineStatus');if(!el)return;el.style.display='inline-block';el.style.background=color||'#3b78a8';el.style.color='#fff';el.textContent=txt;}
 function getPeriods(startStr,endStr){const periods=[];let yr=parseInt(startStr.substring(0,4)),mo=parseInt(startStr.substring(4,6));const eY=parseInt((endStr||startStr).substring(0,4));const eMo=parseInt((endStr||startStr).substring(4,6));while(yr<eY||(yr===eY&&mo<=eMo)){periods.push(yr+String(mo).padStart(2,'0'));mo++;if(mo>12){mo=1;yr++;}}return periods;}
-function runPipeline(){const start=(document.getElementById('cfgStart')||{}).value;const end=(document.getElementById('cfgEnd')||{}).value;if(!start||!end||start>end){showErr('Select a valid start and end month.');return;}document.getElementById('pipelinePanel').style.display='block';document.getElementById('stepList').innerHTML='';Object.keys(_stepEls).forEach(k=>delete _stepEls[k]);setBar(0);setPipelineStatus('Running…','#ffc107');loadAll();}
+function setDqaMode(mode){
+  const isRange = mode==='range';
+  document.getElementById('inputRange').style.display  = isRange ? 'flex'  : 'none';
+  document.getElementById('inputSingle').style.display = isRange ? 'none'  : 'flex';
+  document.getElementById('modeRange').style.background  = isRange ? '#3b78a8' : '#fff';
+  document.getElementById('modeRange').style.color        = isRange ? '#fff'    : '#3b78a8';
+  document.getElementById('modeSingle').style.background = isRange ? '#fff'    : '#3b78a8';
+  document.getElementById('modeSingle').style.color       = isRange ? '#3b78a8' : '#fff';
+}
+function runPipeline(){
+  const isSingle = document.getElementById('inputSingle').style.display !== 'none';
+  let start, end;
+  if(isSingle){
+    const m = (document.getElementById('cfgSingle')||{}).value;
+    if(!m){showErr('Select a month.');return;}
+    start = m; end = m;
+    // Keep cfgStart/cfgEnd in sync so the rest of the pipeline reads them correctly
+    document.getElementById('cfgStart').value = m;
+    document.getElementById('cfgEnd').value   = m;
+  } else {
+    start = (document.getElementById('cfgStart')||{}).value;
+    end   = (document.getElementById('cfgEnd')||{}).value;
+    if(!start||!end||start>end){showErr('Select a valid start and end month.');return;}
+  }
+  document.getElementById('pipelinePanel').style.display='block';
+  document.getElementById('stepList').innerHTML='';
+  Object.keys(_stepEls).forEach(k=>delete _stepEls[k]);
+  setBar(0);setPipelineStatus('Running\u2026','#ffc107');loadAll();
+}
 function dqaReset(){document.getElementById('pipelinePanel').style.display='none';document.getElementById('s-results').classList.add('hidden');document.getElementById('errBanner').innerHTML='';document.getElementById('metaPeriod').textContent='—';document.getElementById('metaFacs').textContent='—';document.getElementById('metaRecords').textContent='—';const ps=document.getElementById('pipelineStatus');if(ps)ps.style.display='none';const ds=document.getElementById('dqaDriveStatus');if(ds)ds.style.display='none';rawData=[];fullOUMap={};allFacMeta={};dqaResults={coherency:{},indicators:{},reporting:null,outliers:{},rankings:[],nonReporting:[],rowIssues:[]};bBrowserReady=false;renderedTabs={};}
 window.addEventListener('load',()=>{document.getElementById('pipelineStatus').style.display='inline-block';document.getElementById('pipelineStatus').textContent='Ready — select date range and click Run';document.getElementById('pipelineStatus').style.background='rgba(59,120,168,.5)';document.getElementById('pipelineStatus').style.color='#fff';});
 </script>
